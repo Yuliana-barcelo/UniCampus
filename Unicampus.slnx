@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Business/uniCampus.BLL/UniCampus.BLL.csproj" />
+  <Project Path="Data/UniCampus.DAL/UniCampus.DAL.csproj" />
+  <Project Path="Presentacion/UniCampus.Web/UniCampus.Web.csproj" />
+  <Project Path="Tests/UniCampus.Test/UniCampus.Test.csproj" />
+</Solution>
