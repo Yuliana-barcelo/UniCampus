@@ -43,10 +43,20 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ActividadService.cs" />
+    <Compile Include="Services\ResultadoGuardarActividad.cs" />
+    <Compile Include="Validations\ReglasActividad.cs" />
+    <Compile Include="Validations\ActividadValidator.cs" />
+    <Compile Include="Services\IResumenActividadService.cs" />
     <Compile Include="Services\InscripcionService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Validations\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Entities\UniCampus.Entities\UniCampus.Entities.csproj">
+      <Project>{A3C725ED-95A2-4711-AD47-C0DAB9E1FC22}</Project>
+      <Name>UniCampus.Entities</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
