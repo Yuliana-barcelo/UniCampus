@@ -52,6 +52,16 @@ namespace uniCampus.BLL.Validations
             if (!finValido)
                 errores.Add("La hora de fin debe estar entre 00:00 y antes de 24:00.");
 
+            // Las fechas se interpretan por Date; reservar la fecha default evita
+            // que una hora interna oculte una fecha no proporcionada.
+            bool fechaInicioProporcionada = actividad.FechaInicio.Date != default(DateTime);
+            bool fechaFinProporcionada = actividad.FechaFin.Date != default(DateTime);
+            if (!fechaInicioProporcionada)
+                errores.Add("La fecha de inicio es obligatoria.");
+            if (!fechaFinProporcionada)
+                errores.Add("La fecha de fin es obligatoria.");
+            if (!fechaInicioProporcionada || !fechaFinProporcionada)
+                return;
             if (actividad.FechaFin.Date < actividad.FechaInicio.Date)
             {
                 errores.Add("La fecha de fin no puede ser anterior a la fecha de inicio.");

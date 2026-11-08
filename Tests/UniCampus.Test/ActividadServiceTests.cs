@@ -61,6 +61,43 @@ namespace UniCampus.Test
         }
 
         [TestMethod]
+        public void Guardar_FechaInicioSinInicializar_ExigeFechaSinPersistir()
+        {
+            var actividad = ActividadValida();
+            actividad.FechaInicio = default(DateTime);
+            AssertFechasObligatorias(actividad, "fecha de inicio");
+        }
+
+        [TestMethod]
+        public void Guardar_FechaFinSinInicializar_ExigeFechaSinPersistir()
+        {
+            var actividad = ActividadValida();
+            actividad.FechaFin = default(DateTime);
+            AssertFechasObligatorias(actividad, "fecha de fin");
+        }
+
+        [TestMethod]
+        public void Guardar_AmbasFechasSinInicializar_ExigeAmbasSinPersistir()
+        {
+            var actividad = ActividadValida();
+            actividad.FechaInicio = default(DateTime);
+            actividad.FechaFin = default(DateTime);
+            AssertFechasObligatorias(actividad, "fecha de inicio", "fecha de fin");
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void Guardar_FechaNoProporcionadaConHoraInterna_NoEludeValidacion(bool esFin)
+        {
+            var actividad = ActividadValida();
+            if (esFin)
+                actividad.FechaFin = DateTime.MinValue.AddHours(12);
+            else
+                actividad.FechaInicio = DateTime.MinValue.AddHours(12);
+            AssertFechasObligatorias(actividad, esFin ? "fecha de fin" : "fecha de inicio");
+        }
+        [TestMethod]
         public void Guardar_FechaFinalAnterior_NoPersiste()
         {
             var actividad = ActividadValida();
@@ -192,10 +229,10 @@ namespace UniCampus.Test
         }
 
         [TestMethod]
-        public void Guardar_FechaMinimaYMaxima_HorasLimite_NoDesborda()
+        public void Guardar_PrimeraFechaProporcionableYMaxima_HorasLimite_NoDesborda()
         {
             var actividad = ActividadValida();
-            actividad.FechaInicio = DateTime.MinValue;
+            actividad.FechaInicio = new DateTime(1, 1, 2);
             actividad.FechaFin = DateTime.MaxValue;
             actividad.HoraInicio = TimeSpan.Zero;
             actividad.HoraFin = TimeSpan.FromDays(1) - TimeSpan.FromTicks(1);
@@ -345,6 +382,22 @@ namespace UniCampus.Test
             Assert.AreEqual(0, repository.Llamadas);
         }
 
+        private static void AssertFechasObligatorias(ActividadDto actividad, params string[] campos)
+        {
+            var repository = new RepositoryFalso();
+            var resultado = new ActividadService(repository, Reglas()).Guardar(actividad);
+            Assert.IsFalse(resultado.Exitoso);
+            Assert.IsNull(resultado.ActividadId);
+            foreach (var campo in campos)
+            {
+                Assert.IsTrue(resultado.Errores.Any(error =>
+                    error.IndexOf(campo, StringComparison.OrdinalIgnoreCase) >= 0 &&
+                    error.Contains("obligatoria")), "Debe exigir el campo: " + campo);
+            }
+            Assert.AreEqual(campos.Length, resultado.Errores.Count,
+                            "No debe comparar el intervalo cuando falta alguna fecha.");
+            Assert.AreEqual(0, repository.Llamadas);
+        }
         private static void AssertInvalida(ActividadDto actividad, string campo)
         {
             var repository = new RepositoryFalso();

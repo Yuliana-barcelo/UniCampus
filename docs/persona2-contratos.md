@@ -17,8 +17,8 @@ Esto no demuestra todavía un flujo Web -> SQL Server.
 | Titulo | string | Obligatorio; no nulo, vacío ni solo espacios. |
 | Descripcion | string | Obligatoria; no nula, vacía ni solo espacios. |
 | TipoId | int | Positivo; verificar existencia corresponde al catálogo/esquema acordado. |
-| FechaInicio | DateTime | Fecha de inicio; negocio utiliza su componente Date. |
-| FechaFin | DateTime | Fecha de fin; negocio utiliza su componente Date. |
+| FechaInicio | DateTime | Obligatoria; negocio utiliza Date y rechaza la fecha de default(DateTime). |
+| FechaFin | DateTime | Obligatoria; negocio utiliza Date y rechaza la fecha de default(DateTime). |
 | HoraInicio | TimeSpan | Hora del día en [00:00, 24:00). |
 | HoraFin | TimeSpan | Hora del día en [00:00, 24:00). |
 | Modalidad | string | Valor perteneciente al catálogo configurado. |
@@ -112,7 +112,7 @@ debe pertenecer al catálogo de modalidades.
 1. DTO no nulo.
 2. Título y descripción obligatorios, incluidos nulos y espacios.
 3. TipoId y Cupos mayores que cero.
-4. FechaFin.Date no anterior a FechaInicio.Date.
+4. Fechas de inicio y fin obligatorias (distintas de la fecha default); FechaFin.Date no anterior a FechaInicio.Date.
 5. Horas del día no negativas y menores de 24 horas.
 6. FechaFin.Date + HoraFin estrictamente posterior a FechaInicio.Date + HoraInicio.
 7. Modalidad y estado presentes en sus catálogos explícitos.
@@ -124,7 +124,7 @@ debe pertenecer al catálogo de modalidades.
 Se permiten actividades de varios días y cruzar medianoche cuando FechaFin es el día siguiente.
 No se impone HoraFin > HoraInicio si las fechas son distintas.
 No se restringe el rango de fechas al de SQL datetime sin un esquema acordado: se valida el rango
-de DateTime de .NET, incluidas fechas mínima/máxima. Persona 1 debe confirmar date/datetime2 frente
+de DateTime de .NET, salvo la fecha reservada para indicar ausencia; se conserva el máximo representable. Persona 1 debe confirmar date/datetime2 frente
 a datetime y la precisión SQL time. La conversión de horas no debe redondear a 24:00.
 
 Se ignora el componente horario de FechaInicio/FechaFin al validar: las horas explícitas son
@@ -205,7 +205,7 @@ La prueba vacía UnitTest1 de la base se conserva para no mezclar limpiezas ajen
 - Equipo: modalidades, lugar, estados administrativos y semántica de creación/edición.
 - Persona 4/5: definición y origen de estadísticas, conteo de inscritos y contrato temporal.
 - Equipo: ejecutar una prueba de integración real Web -> Presenter -> BLL -> DAL -> SQL Server.
-## Resultados ejecutados en esta rama (8 de noviembre de 2026)
+## Resultados de implementación inicial (8 de noviembre de 2026)
 
 - Base original: solución compilada y 1 prueba vacía ejecutada correctamente.
 - RED: 52 casos ejecutados; 51 nuevos fallaron contra el servicio sin implementar y pasó la prueba vacía original.
@@ -215,3 +215,47 @@ La prueba vacía UnitTest1 de la base se conserva para no mezclar limpiezas ajen
 - Revisión independiente estática: sin hallazgos accionables.
 - Web, DAL, Database y sus referencias existentes: sin cambios.
 - Evidencia local de compilación y TRX en TestResults (ignorado por Git); no contiene una prueba de SQL.
+
+
+## Corrección: fechas obligatorias
+
+Los DTOs conservan DateTime no nullable para evitar romper el contrato compartido.
+Por ello se reserva default(DateTime).Date (0001-01-01) como indicador de fecha no proporcionada.
+Se compara Date, no el instante completo: una hora interna distinta de cero no debe ocultar
+la ausencia, porque HoraInicio/HoraFin son la fuente independiente del horario.
+
+Si falta una fecha se devuelve su error obligatorio; si faltan ambas se devuelven los dos.
+No se comparan ni combinan fechas incompletas; no se llama a IActividadRepository.Guardar.
+La validación de los demás campos sigue acumulando errores.
+
+La primera fecha admitida es 0001-01-02. Esta exclusión del primer día deriva únicamente del
+indicador de ausencia del DTO, no de una política de antigüedad o de fechas futuras.
+Se mantienen pruebas del primer día admitido, DateTime.MaxValue y el último tick horario válido.
+La prueba anterior que aceptaba DateTime.MinValue fue actualizada porque contradice esta regla.
+Si el equipo necesita representar legítimamente 0001-01-01, deberá acordar un contrato nullable
+o una representación explícita de ausencia; no se cambia ese contrato en esta corrección.
+
+## Decisiones de integración todavía pendientes
+
+| Tema | Responsabilidad propuesta y decisión pendiente |
+|---|---|
+| Longitud máxima de Titulo y Descripcion | Persona 1 debe confirmar tipos, tamaños y nulabilidad del futuro esquema SQL; el equipo debe aprobar los límites y después alinearlos en BLL y formulario. Esta rama no fija longitudes, trunca cadenas ni presupone un tamaño SQL. |
+| Registro técnico de fallos de persistencia | Propuesta: DAL/infraestructura registra el diagnóstico técnico con el mecanismo de logging que acuerde el equipo, sin credenciales ni datos sensibles. BLL devuelve únicamente el error público seguro. El registro aún no está implementado ni verificado en DAL; se debe acordar responsable, destino y correlación. |
+| Creación con ActividadId distinto de cero | Pendiente acordar si se rechaza, se ignora para generar otro id o se trata mediante una operación de edición separada. El ejemplo de creación usa 0. Esta corrección no selecciona una política: BLL conserva y reenvía el valor; el repositorio concreto no debe asumir silenciosamente una semántica sin acuerdo. |
+| Configuración desde Web | El punto de composición Web debe obtener los catálogos aprobados y construir ReglasActividad, el repositorio concreto y ActividadService; después inyectar el servicio en el Presenter. No se fija si los catálogos proceden de configuración o de datos. Deben incluirse modalidades, estados y el subconjunto de modalidades con lugar obligatorio. Los valores de ejemplos/pruebas siguen siendo ilustrativos. |
+
+No se modifica código Web, DAL ni SQL para resolver estos acuerdos.
+
+## Verificación de la corrección de fechas (8 de noviembre de 2026)
+
+- RED: 57 casos ejecutados; los 5 casos nuevos fallaron y los 52 anteriores pasaron.
+- Rebuild Debug con MSBuild de Visual Studio: 0 errores y 0 advertencias.
+- MSTest Debug: 57/57 correctos.
+- Rebuild Release con MSBuild de Visual Studio: 0 errores y 0 advertencias.
+- MSTest Release: 57/57 correctos.
+- Total: 56 casos de negocio y la prueba vacía original conservada.
+- Se comprobaron fechas ausentes individualmente y juntas, ausencia con hora interna,
+  error obligatorio por campo y cero llamadas al repositorio para estos datos inválidos.
+- La prueba de límite inferior ahora usa 0001-01-02 y se conserva el límite superior.
+- git diff --check correcto; solo cambian validador, pruebas y este documento.
+- Logs/TRX locales en TestResults/fechas-*; no se ejecutó SQL.
