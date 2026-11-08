@@ -68,8 +68,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Actividades.aspx" />
+    <Content Include="Controls\FormularioActividad.ascx" />
     <Content Include="Controls\PanelesActividad.ascx" />
     <Content Include="Inscripciones.aspx" />
+    <Content Include="PruebaFormulario.aspx" />
     <Content Include="PruebaPaneles.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -81,6 +83,12 @@
     <Compile Include="Actividades.aspx.designer.cs">
       <DependentUpon>Actividades.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Controls\FormularioActividad.ascx.cs">
+      <DependentUpon>FormularioActividad.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\FormularioActividad.ascx.designer.cs">
+      <DependentUpon>FormularioActividad.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Controls\PanelesActividad.ascx.cs">
       <DependentUpon>PanelesActividad.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -88,6 +96,7 @@
     <Compile Include="Controls\PanelesActividad.ascx.designer.cs">
       <DependentUpon>PanelesActividad.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Controls\RepositorioActividadTemporal.cs" />
     <Compile Include="Inscripciones.aspx.cs">
       <DependentUpon>Inscripciones.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -96,8 +105,16 @@
       <DependentUpon>Inscripciones.aspx</DependentUpon>
     </Compile>
     <Compile Include="Presenters\ActividadesPresenter.cs" />
+    <Compile Include="Presenters\ActividadPresenter.cs" />
     <Compile Include="Presenters\InscripcionesPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PruebaFormulario.aspx.cs">
+      <DependentUpon>PruebaFormulario.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PruebaFormulario.aspx.designer.cs">
+      <DependentUpon>PruebaFormulario.aspx</DependentUpon>
+    </Compile>
     <Compile Include="PruebaPaneles.aspx.cs">
       <DependentUpon>PruebaPaneles.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -106,6 +123,7 @@
       <DependentUpon>PruebaPaneles.aspx</DependentUpon>
     </Compile>
     <Compile Include="Views\IActividadesView.cs" />
+    <Compile Include="Views\IActividadView.cs" />
     <Compile Include="Views\IDetalleActividadView.cs" />
     <Compile Include="Views\IInscripcionesView.cs" />
   </ItemGroup>
@@ -126,6 +144,10 @@
     <ProjectReference Include="..\..\Data\UniCampus.DAL\UniCampus.DAL.csproj">
       <Project>{25a5b51f-01f5-4ab0-a8a6-cb0b03aef16e}</Project>
       <Name>UniCampus.DAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Entities\UniCampus.Entities\UniCampus.Entities.csproj">
+      <Project>{a3c725ed-95a2-4711-ad47-c0dab9e1fc22}</Project>
+      <Name>UniCampus.Entities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Tests\UniCampus.Test\UniCampus.Test.csproj">
       <Project>{8562fe5a-e1a3-41d0-8541-117a7349fb56}</Project>
