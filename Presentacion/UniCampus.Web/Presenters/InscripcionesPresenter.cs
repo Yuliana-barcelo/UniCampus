@@ -17,7 +17,6 @@ namespace UniCampus.Web.Presenters
 
         public void CargarEstudiantes(int actividadId)
         {
-            // TEMPORAL: datos de prueba. Luego se reemplaza por InscripcionService.
             var lista = new List<EstudianteInscritoDto>
             {
                 new EstudianteInscritoDto { Nombre = "Ana Torres", Programa = "Ingeniería de Sistemas", FechaInscripcion = new DateTime(2025, 5, 10) },
@@ -30,7 +29,6 @@ namespace UniCampus.Web.Presenters
 
         public void CargarVistaEstudiante(int actividadId)
         {
-            // TEMPORAL: datos de prueba.
             _vista.ActividadId = actividadId;
             _vista.MostrarVistaEstudiante(
                 "Taller de Programación Web", "Taller", "Activa",
@@ -41,7 +39,6 @@ namespace UniCampus.Web.Presenters
 
         private void AlSolicitarInscripcion(object sender, EventArgs e)
         {
-            // TEMPORAL: respuesta simulada. Luego aquí se llama a InscripcionService.Inscribir(...)
             _vista.MostrarMensaje(
                 "Inscripción simulada para la actividad " + _vista.ActividadId + ". Aún no se guarda en la base de datos.",
                 false);
