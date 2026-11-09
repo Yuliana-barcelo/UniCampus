@@ -26,18 +26,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
     <Compile Include="ActividadDto.cs" />
     <Compile Include="EstudianteInscritoDto.cs" />
     <Compile Include="InscripcionDto.cs" />
     <Compile Include="Contracts\IInscripcionRepository.cs" />
     <Compile Include="Contracts\IResenaRepository.cs" />
-    <Compile Include="EstudianteInscritoDto.cs" />
+   
     <Compile Include="ResenaDto.cs" />
     <Compile Include="ResultadoInscripcionDatos.cs" />
     <Compile Include="TipoActividadDto.cs" />
     <Compile Include="ResumenDto.cs" />
     <Compile Include="Contracts\IActividadRepository.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
