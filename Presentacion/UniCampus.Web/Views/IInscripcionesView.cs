@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UniCampus.Entities;
 
-namespace UniCampus.Web.View
+namespace UniCampus.Web.Views
 {
-    internal interface IInscripcionesView
+    public interface IInscripcionesView
     {
+        int ActividadId { get; set; }
+
+        event EventHandler InscribirmeSolicitado;
+
+        void MostrarEstudiantes(IList<EstudianteInscritoDto> estudiantes);
+        void MostrarVistaEstudiante(string titulo, string tipo, string estado,
+                                    string fechas, string horario, string lugar,
+                                    int cuposDisponibles, int cupoTotal, string descripcion);
+        void MostrarMensaje(string mensaje, bool esError);
     }
 }
