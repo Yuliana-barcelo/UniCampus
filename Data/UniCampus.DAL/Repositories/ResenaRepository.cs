@@ -20,9 +20,10 @@ namespace UniCampus.DAL.Repositories
 
         public int Guardar(ResenaDto resena)
         {
+            // FechaCreacion la pone la base por defecto
             const string sql = @"
-                INSERT INTO Resena (ActividadId, UsuarioId, Calificacion, Comentario, Fecha)
-                VALUES (@ActividadId, @UsuarioId, @Calificacion, @Comentario, GETDATE());
+                INSERT INTO Resena (ActividadId, UsuarioId, Calificacion, Comentario)
+                VALUES (@ActividadId, @UsuarioId, @Calificacion, @Comentario);
                 SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
             using (var cn = new SqlConnection(connectionString))
@@ -30,8 +31,8 @@ namespace UniCampus.DAL.Repositories
             {
                 cmd.Parameters.Add("@ActividadId", SqlDbType.Int).Value = resena.ActividadId;
                 cmd.Parameters.Add("@UsuarioId", SqlDbType.Int).Value = resena.UsuarioId;
-                cmd.Parameters.Add("@Calificacion", SqlDbType.Int).Value = resena.Calificacion;
-                cmd.Parameters.Add("@Comentario", SqlDbType.NVarChar, 500).Value =
+                cmd.Parameters.Add("@Calificacion", SqlDbType.TinyInt).Value = (byte)resena.Calificacion;
+                cmd.Parameters.Add("@Comentario", SqlDbType.NVarChar, 1000).Value =
                     (object)resena.Comentario ?? DBNull.Value;
                 cn.Open();
                 return (int)cmd.ExecuteScalar();
@@ -40,7 +41,9 @@ namespace UniCampus.DAL.Repositories
 
         public bool ExisteResena(int actividadId, int usuarioId)
         {
-            const string sql = "SELECT COUNT(*) FROM Resena WHERE ActividadId = @ActividadId AND UsuarioId = @UsuarioId;";
+            const string sql =
+                "SELECT COUNT(*) FROM Resena WHERE ActividadId = @ActividadId AND UsuarioId = @UsuarioId;";
+
             using (var cn = new SqlConnection(connectionString))
             using (var cmd = new SqlCommand(sql, cn))
             {
@@ -55,11 +58,11 @@ namespace UniCampus.DAL.Repositories
         {
             const string sql = @"
                 SELECT r.ResenaId, r.ActividadId, r.UsuarioId, u.Nombre,
-                       r.Calificacion, r.Comentario, r.Fecha
+                       r.Calificacion, r.Comentario, r.FechaCreacion
                 FROM Resena r
                 INNER JOIN Usuario u ON u.UsuarioId = r.UsuarioId
                 WHERE r.ActividadId = @ActividadId
-                ORDER BY r.Fecha DESC;";
+                ORDER BY r.FechaCreacion DESC;";
 
             var lista = new List<ResenaDto>();
             using (var cn = new SqlConnection(connectionString))
@@ -77,7 +80,7 @@ namespace UniCampus.DAL.Repositories
                             ActividadId = rd.GetInt32(1),
                             UsuarioId = rd.GetInt32(2),
                             NombreUsuario = rd.GetString(3),
-                            Calificacion = rd.GetInt32(4),
+                            Calificacion = rd.GetByte(4),   // TINYINT en la base
                             Comentario = rd.IsDBNull(5) ? string.Empty : rd.GetString(5),
                             Fecha = rd.GetDateTime(6)
                         });
