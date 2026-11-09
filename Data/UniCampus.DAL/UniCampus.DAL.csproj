@@ -46,6 +46,11 @@
     <Compile Include="Repositories\ActividadRepository.cs" />
     <Compile Include="Repositories\InscripcionRepository.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Entities\UniCampus.Entities\UniCampus.Entities.csproj">
+      <Project>{a3c725ed-95a2-4711-ad47-c0dab9e1fc22}</Project>
+      <Name>UniCampus.Entities</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

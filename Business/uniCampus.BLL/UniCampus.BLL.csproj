@@ -49,14 +49,12 @@
     <Compile Include="Services\IResumenActividadService.cs" />
     <Compile Include="Services\InscripcionService.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Validations\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\Entities\UniCampus.Entities\UniCampus.Entities.csproj">
-      <Project>{A3C725ED-95A2-4711-AD47-C0DAB9E1FC22}</Project>
+      <Project>{a3c725ed-95a2-4711-ad47-c0dab9e1fc22}</Project>
       <Name>UniCampus.Entities</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
