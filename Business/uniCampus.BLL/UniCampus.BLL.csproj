@@ -43,7 +43,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ActividadService.cs" />
+    <Compile Include="Services\ResenaService.cs" />
     <Compile Include="Services\ResultadoGuardarActividad.cs" />
+    <Compile Include="Services\ResultadoOperacion.cs" />
     <Compile Include="Validations\ReglasActividad.cs" />
     <Compile Include="Validations\ActividadValidator.cs" />
     <Compile Include="Services\IResumenActividadService.cs" />
