@@ -25,7 +25,7 @@ namespace UniCampus.DAL.Repositories
                        u.Nombre, u.Programa, i.FechaInscripcion
                 FROM Inscripcion i
                 INNER JOIN Usuario u ON u.UsuarioId = i.UsuarioId
-                WHERE i.ActividadId = @ActividadId
+                WHERE i.ActividadId = @ActividadId AND i.Estado = N'Activa'
                 ORDER BY i.FechaInscripcion, i.InscripcionId;";
 
             var lista = new List<EstudianteInscritoDto>();
@@ -55,7 +55,9 @@ namespace UniCampus.DAL.Repositories
 
         public int ContarInscritos(int actividadId)
         {
-            const string sql = "SELECT COUNT(*) FROM Inscripcion WHERE ActividadId = @ActividadId;";
+            const string sql =
+                "SELECT COUNT(*) FROM Inscripcion WHERE ActividadId = @ActividadId AND Estado = N'Activa';";
+
             using (var cn = new SqlConnection(connectionString))
             using (var cmd = new SqlCommand(sql, cn))
             {
@@ -77,7 +79,8 @@ namespace UniCampus.DAL.Repositories
                         // 1) Bloquea la fila de la actividad: dos inscripciones simultáneas se atienden una tras otra.
                         object cuposObj;
                         using (var cmd = new SqlCommand(
-                            "SELECT Cupos FROM Actividad WITH (UPDLOCK, ROWLOCK) WHERE ActividadId = @ActividadId;", cn, tx))
+                            "SELECT Cupos FROM ActividadAcademica WITH (UPDLOCK, ROWLOCK) WHERE ActividadId = @ActividadId;",
+                            cn, tx))
                         {
                             cmd.Parameters.Add("@ActividadId", SqlDbType.Int).Value = actividadId;
                             cuposObj = cmd.ExecuteScalar();
@@ -88,10 +91,11 @@ namespace UniCampus.DAL.Repositories
                             return ResultadoInscripcionDatos.ActividadNoExiste;
                         }
 
-                        // 2) Duplicado
+                        // 2) Duplicado (la tabla tiene UNIQUE (ActividadId, UsuarioId), cualquiera sea el estado)
                         int existe;
                         using (var cmd = new SqlCommand(
-                            "SELECT COUNT(*) FROM Inscripcion WHERE ActividadId = @ActividadId AND UsuarioId = @UsuarioId;", cn, tx))
+                            "SELECT COUNT(*) FROM Inscripcion WHERE ActividadId = @ActividadId AND UsuarioId = @UsuarioId;",
+                            cn, tx))
                         {
                             cmd.Parameters.Add("@ActividadId", SqlDbType.Int).Value = actividadId;
                             cmd.Parameters.Add("@UsuarioId", SqlDbType.Int).Value = usuarioId;
@@ -103,10 +107,11 @@ namespace UniCampus.DAL.Repositories
                             return ResultadoInscripcionDatos.Duplicada;
                         }
 
-                        // 3) Cupo
+                        // 3) Cupo (solo cuentan las inscripciones activas)
                         int inscritos;
                         using (var cmd = new SqlCommand(
-                            "SELECT COUNT(*) FROM Inscripcion WHERE ActividadId = @ActividadId;", cn, tx))
+                            "SELECT COUNT(*) FROM Inscripcion WHERE ActividadId = @ActividadId AND Estado = N'Activa';",
+                            cn, tx))
                         {
                             cmd.Parameters.Add("@ActividadId", SqlDbType.Int).Value = actividadId;
                             inscritos = (int)cmd.ExecuteScalar();
@@ -117,10 +122,11 @@ namespace UniCampus.DAL.Repositories
                             return ResultadoInscripcionDatos.SinCupo;
                         }
 
-                        // 4) Inscribe
+                        // 4) Inscribe (FechaInscripcion y Estado los pone la base por defecto)
                         using (var cmd = new SqlCommand(
-                            @"INSERT INTO Inscripcion (ActividadId, UsuarioId, FechaInscripcion, Estado)
-                              VALUES (@ActividadId, @UsuarioId, GETDATE(), 'Activa');", cn, tx))
+                            @"INSERT INTO Inscripcion (ActividadId, UsuarioId)
+                              VALUES (@ActividadId, @UsuarioId);",
+                            cn, tx))
                         {
                             cmd.Parameters.Add("@ActividadId", SqlDbType.Int).Value = actividadId;
                             cmd.Parameters.Add("@UsuarioId", SqlDbType.Int).Value = usuarioId;
