@@ -28,6 +28,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Compile Include="ActividadDto.cs" />
+    <Compile Include="EstudianteInscritoDto.cs" />
+    <Compile Include="InscripcionDto.cs" />
     <Compile Include="Contracts\IInscripcionRepository.cs" />
     <Compile Include="Contracts\IResenaRepository.cs" />
     <Compile Include="EstudianteInscritoDto.cs" />
