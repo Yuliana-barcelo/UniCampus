@@ -1,4 +1,4 @@
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -31,12 +31,15 @@
     <Compile Include="InscripcionDto.cs" />
     <Compile Include="Contracts\IInscripcionRepository.cs" />
     <Compile Include="Contracts\IResenaRepository.cs" />
-   
     <Compile Include="ResenaDto.cs" />
     <Compile Include="ResultadoInscripcionDatos.cs" />
-    <Compile Include="TipoActividadDto.cs" />
     <Compile Include="ResumenDto.cs" />
     <Compile Include="Contracts\IActividadRepository.cs" />
+    <Compile Include="TipoActividadDto.cs" />
+    <Compile Include="UsuarioDto.cs" />
+    <Compile Include="PaginaActividadesDto.cs" />
+    <Compile Include="MiInscripcionDto.cs" />
+    <Compile Include="Contracts\IUsuarioRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

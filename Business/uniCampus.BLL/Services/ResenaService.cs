@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using UniCampus.Entities;
 using UniCampus.Entities.Contracts;
@@ -48,8 +49,9 @@ namespace uniCampus.BLL.Services
                     return ResultadoOperacion.Fallo(ErrorGeneral);
                 return ResultadoOperacion.Ok("Reseña guardada correctamente.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Trace.TraceError("Error en ResenaService.cs: {0}", ex);
                 return ResultadoOperacion.Fallo(ErrorGeneral);
             }
         }

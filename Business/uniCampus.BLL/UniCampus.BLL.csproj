@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -50,9 +50,14 @@
     <Compile Include="Validations\ActividadValidator.cs" />
     <Compile Include="Services\IResumenActividadService.cs" />
     <Compile Include="Services\InscripcionService.cs" />
+    <Compile Include="Services\UsuarioService.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\..\Data\UniCampus.DAL\UniCampus.DAL.csproj">
+      <Project>{25a5b51f-01f5-4ab0-a8a6-cb0b03aef16e}</Project>
+      <n>UniCampus.DAL</n>
+    </ProjectReference>
     <ProjectReference Include="..\..\Entities\UniCampus.Entities\UniCampus.Entities.csproj">
       <Project>{a3c725ed-95a2-4711-ad47-c0dab9e1fc22}</Project>
       <Name>UniCampus.Entities</Name>

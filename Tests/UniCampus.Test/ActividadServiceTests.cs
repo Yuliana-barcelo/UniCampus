@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -459,6 +459,18 @@ namespace UniCampus.Test
                     throw Error;
                 return Id;
             }
+
+            // Miembros nuevos del contrato IActividadRepository (no se usan en estas pruebas).
+            public bool Actualizar(ActividadDto actividad) { return true; }
+            public bool Desactivar(int actividadId) { return true; }
+            public ActividadDto ObtenerPorId(int actividadId) { return null; }
+            public PaginaActividadesDto Listar(string busqueda, int pagina, int tamPagina)
+            {
+                return new PaginaActividadesDto { Items = new List<ActividadDto>(), Pagina = pagina, TamPagina = tamPagina };
+            }
+            public IList<TipoActividadDto> ObtenerTipos() { return new List<TipoActividadDto>(); }
+            public ResumenDto ObtenerResumen() { return new ResumenDto(); }
+            public int ContarInscritosActivos(int actividadId) { return 0; }
         }
     }
 }

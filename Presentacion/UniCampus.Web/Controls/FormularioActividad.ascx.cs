@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Web.UI;
 using uniCampus.BLL.Services;
-using uniCampus.BLL.Validations;
 using UniCampus.Entities;
-using UniCampus.Entities.Contracts;
 using UniCampus.Web.Presenters;
+using UniCampus.Web.Security;
 using UniCampus.Web.Views;
 
 namespace UniCampus.Web.Controls
@@ -14,41 +14,24 @@ namespace UniCampus.Web.Controls
     {
         private ActividadPresenter _presenter;
 
-        // Lo escuchará Actividades.aspx (Persona 4) para refrescar el listado
-        public event EventHandler ActividadGuardada;
+        /// <summary>Actividades.aspx lo escucha para refrescar KPIs, listado y paneles.</summary>
+        public event EventHandler<IdEventArgs> ActividadGuardada;
 
         protected void Page_Init(object sender, EventArgs e)
         {
-            _presenter = new ActividadPresenter(this, CrearServicio());
+            _presenter = new ActividadPresenter(this, new ActividadService());
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
-            {
-                // Lista temporal: todavía no existe un servicio de tipos
-                CargarTipos(new List<TipoActividadDto>
-                {
-                    new TipoActividadDto { TipoId = 1, Nombre = "Taller" },
-                    new TipoActividadDto { TipoId = 2, Nombre = "Conferencia" },
-                    new TipoActividadDto { TipoId = 3, Nombre = "Seminario" },
-                    new TipoActividadDto { TipoId = 4, Nombre = "Curso" },
-                    new TipoActividadDto { TipoId = 5, Nombre = "Encuentro" }
-                });
-            }
+                _presenter.CargarTipos();   // los tipos vienen de SQL Server, no de una lista fija
         }
 
-        private static ActividadService CrearServicio()
+        /// <summary>La llama la página cuando se pulsa el lápiz del listado.</summary>
+        public void Editar(int actividadId)
         {
-            var reglas = new ReglasActividad(
-                new[] { "Presencial", "Virtual", "Híbrida" },  // modalidades permitidas
-                new[] { "Presencial", "Híbrida" },             // modalidades que exigen lugar
-                new[] { "Activa", "Próxima", "Finalizada" });  // estados permitidos
-
-            // Cuando la Persona 1 suba el repositorio real, cambiar por: new ActividadRepository()
-            IActividadRepository repositorio = new RepositorioActividadTemporal();
-
-            return new ActividadService(repositorio, reglas);
+            _presenter.CargarParaEdicion(actividadId);
         }
 
         protected void btnGuardar_Click(object sender, EventArgs e)
@@ -61,7 +44,27 @@ namespace UniCampus.Web.Controls
             _presenter.Limpiar();
         }
 
-        // ---------- Implementación de IActividadView ----------
+        // ---------- IActividadView ----------
+
+        public int ActividadId
+        {
+            get { return ViewState["ActividadId"] == null ? 0 : (int)ViewState["ActividadId"]; }
+            set
+            {
+                ViewState["ActividadId"] = value;
+                lblTituloForm.Text = value > 0 ? "Editar Actividad Académica" : "Nueva Actividad Académica";
+                lblTextoGuardar.Text = value > 0 ? "Actualizar" : "Guardar";
+            }
+        }
+
+        public string RolUsuario
+        {
+            get
+            {
+                var u = SesionUsuario.Actual;
+                return u == null ? string.Empty : u.Rol;
+            }
+        }
 
         public string Titulo
         {
@@ -83,25 +86,25 @@ namespace UniCampus.Web.Controls
 
         public DateTime? FechaInicio
         {
-            get { DateTime f; return DateTime.TryParse(txtFechaInicio.Text, out f) ? f : (DateTime?)null; }
+            get { return LeerFecha(txtFechaInicio.Text); }
             set { txtFechaInicio.Text = value.HasValue ? value.Value.ToString("yyyy-MM-dd") : ""; }
         }
 
         public DateTime? FechaFin
         {
-            get { DateTime f; return DateTime.TryParse(txtFechaFin.Text, out f) ? f : (DateTime?)null; }
+            get { return LeerFecha(txtFechaFin.Text); }
             set { txtFechaFin.Text = value.HasValue ? value.Value.ToString("yyyy-MM-dd") : ""; }
         }
 
         public TimeSpan? HoraInicio
         {
-            get { TimeSpan h; return TimeSpan.TryParse(txtHoraInicio.Text, out h) ? h : (TimeSpan?)null; }
+            get { return LeerHora(txtHoraInicio.Text); }
             set { txtHoraInicio.Text = value.HasValue ? value.Value.ToString(@"hh\:mm") : ""; }
         }
 
         public TimeSpan? HoraFin
         {
-            get { TimeSpan h; return TimeSpan.TryParse(txtHoraFin.Text, out h) ? h : (TimeSpan?)null; }
+            get { return LeerHora(txtHoraFin.Text); }
             set { txtHoraFin.Text = value.HasValue ? value.Value.ToString(@"hh\:mm") : ""; }
         }
 
@@ -113,8 +116,8 @@ namespace UniCampus.Web.Controls
 
         public int? Cupos
         {
-            get { int c; return int.TryParse(txtCupos.Text, out c) ? c : (int?)null; }
-            set { txtCupos.Text = value.HasValue ? value.Value.ToString() : ""; }
+            get { int c; return int.TryParse(txtCupos.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out c) ? c : (int?)null; }
+            set { txtCupos.Text = value.HasValue ? value.Value.ToString(CultureInfo.InvariantCulture) : ""; }
         }
 
         public string Lugar
@@ -145,6 +148,7 @@ namespace UniCampus.Web.Controls
 
         public void LimpiarFormulario()
         {
+            ActividadId = 0;
             txtTitulo.Text = "";
             txtDescripcion.Text = "";
             txtLugar.Text = "";
@@ -153,15 +157,31 @@ namespace UniCampus.Web.Controls
             txtFechaFin.Text = "";
             txtHoraInicio.Text = "";
             txtHoraFin.Text = "";
-            ddlTipo.SelectedIndex = 0;
+            if (ddlTipo.Items.Count > 0) ddlTipo.SelectedIndex = 0;
             ddlModalidad.SelectedIndex = 0;
             ddlEstado.SelectedIndex = 0;
         }
 
-        public void NotificarGuardado()
+        public void NotificarGuardado(int actividadId)
         {
             var manejador = ActividadGuardada;
-            if (manejador != null) manejador(this, EventArgs.Empty);
+            if (manejador != null) manejador(this, new IdEventArgs(actividadId));
+        }
+
+        // ---------- lectura segura de fechas y horas (formato fijo del navegador) ----------
+
+        private static DateTime? LeerFecha(string texto)
+        {
+            DateTime f;
+            return DateTime.TryParseExact((texto ?? "").Trim(), "yyyy-MM-dd",
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out f) ? f : (DateTime?)null;
+        }
+
+        private static TimeSpan? LeerHora(string texto)
+        {
+            TimeSpan h;
+            return TimeSpan.TryParseExact((texto ?? "").Trim(), new[] { @"hh\:mm", @"hh\:mm\:ss" },
+                CultureInfo.InvariantCulture, out h) ? h : (TimeSpan?)null;
         }
     }
 }

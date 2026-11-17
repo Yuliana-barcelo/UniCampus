@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UniCampus.Entities;
 
@@ -41,6 +41,12 @@ namespace uniCampus.BLL.Validations
                 errores.Add("El identificador del tipo de actividad debe ser mayor que cero.");
             if (actividad.Cupos <= 0)
                 errores.Add("Los cupos deben ser mayores que cero.");
+            if (actividad.Titulo != null && actividad.Titulo.Trim().Length > 120)
+                errores.Add("El título no puede superar 120 caracteres.");
+            if (actividad.Descripcion != null && actividad.Descripcion.Trim().Length > 1000)
+                errores.Add("La descripción no puede superar 1000 caracteres.");
+            if (actividad.Lugar != null && actividad.Lugar.Trim().Length > 150)
+                errores.Add("El lugar no puede superar 150 caracteres.");
         }
 
         private static void ValidarIntervalo(ActividadDto actividad, List<string> errores)

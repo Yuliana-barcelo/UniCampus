@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using UniCampus.DAL.Connection;
 using UniCampus.Entities;
 using UniCampus.Entities.Contracts;
 
@@ -10,6 +11,8 @@ namespace UniCampus.DAL.Repositories
     public class ResenaRepository : IResenaRepository
     {
         private readonly string connectionString;
+
+        public ResenaRepository() : this(DbConnection.ConnectionString) { }
 
         public ResenaRepository(string connectionString)
         {
@@ -22,7 +25,7 @@ namespace UniCampus.DAL.Repositories
         {
             // FechaCreacion la pone la base por defecto
             const string sql = @"
-                INSERT INTO Resena (ActividadId, UsuarioId, Calificacion, Comentario)
+                INSERT INTO dbo.Resena (ActividadId, UsuarioId, Calificacion, Comentario)
                 VALUES (@ActividadId, @UsuarioId, @Calificacion, @Comentario);
                 SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
@@ -42,7 +45,7 @@ namespace UniCampus.DAL.Repositories
         public bool ExisteResena(int actividadId, int usuarioId)
         {
             const string sql =
-                "SELECT COUNT(*) FROM Resena WHERE ActividadId = @ActividadId AND UsuarioId = @UsuarioId;";
+                "SELECT COUNT(*) FROM dbo.Resena WHERE ActividadId = @ActividadId AND UsuarioId = @UsuarioId;";
 
             using (var cn = new SqlConnection(connectionString))
             using (var cmd = new SqlCommand(sql, cn))
@@ -59,8 +62,8 @@ namespace UniCampus.DAL.Repositories
             const string sql = @"
                 SELECT r.ResenaId, r.ActividadId, r.UsuarioId, u.Nombre,
                        r.Calificacion, r.Comentario, r.FechaCreacion
-                FROM Resena r
-                INNER JOIN Usuario u ON u.UsuarioId = r.UsuarioId
+                FROM dbo.Resena r
+                INNER JOIN dbo.Usuario u ON u.UsuarioId = r.UsuarioId
                 WHERE r.ActividadId = @ActividadId
                 ORDER BY r.FechaCreacion DESC;";
 
