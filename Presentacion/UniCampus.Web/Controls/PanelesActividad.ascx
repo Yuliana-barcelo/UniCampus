@@ -56,7 +56,7 @@
 
     <%-- 3. Vista de la actividad como la ve el estudiante --%>
     <section class="card panel-vista">
-        <header class="card-header"><h3><svg class="ico ico-azul"><use href="#i-calendar"/></svg> Vista de la Actividad (como la ve el estudiante)</h3></header>
+        <header class="card-header"><h3><svg class="ico ico-azul"><use href="#i-calendar"/></svg> Vista de la Actividad</h3></header>
         <div class="vista-cuerpo">
             <div class="foto-actividad" aria-hidden="true">
                 <svg viewBox="0 0 160 130" preserveAspectRatio="xMidYMid slice">
