@@ -15,6 +15,8 @@ namespace UniCampus.Test
 
         public IList<EstudianteInscritoDto> ListarPorActividad(int actividadId) { return new List<EstudianteInscritoDto>(); }
         public int ContarInscritos(int actividadId) { return 0; }
+        public IList<MiInscripcionDto> ListarPorUsuario(int usuarioId) { return new List<MiInscripcionDto>(); }
+        public bool Cancelar(int inscripcionId, int usuarioSolicitanteId, bool esAdministrador) { return true; }
         public ResultadoInscripcionDatos Inscribir(int actividadId, int usuarioId)
         {
             Llamadas++;
@@ -64,6 +66,29 @@ namespace UniCampus.Test
         {
             var s = new InscripcionService(new RepoInscripcionFalso { Respuesta = ResultadoInscripcionDatos.ActividadNoExiste });
             Assert.IsFalse(s.Inscribir(99, 10).Exito);
+        }
+
+        [TestMethod]
+        public void Inscribir_ActividadNoDisponible_SeRechaza()
+        {
+            var s = new InscripcionService(new RepoInscripcionFalso { Respuesta = ResultadoInscripcionDatos.ActividadNoDisponible });
+            Assert.IsFalse(s.Inscribir(1, 10).Exito);
+        }
+
+        [TestMethod]
+        public void InscribirEstudiante_ComoEstudiante_SeRechazaSinLlamarAlRepositorio()
+        {
+            var repo = new RepoInscripcionFalso();
+            var s = new InscripcionService(repo);
+            Assert.IsFalse(s.InscribirEstudiante(1, 10, "Estudiante").Exito);
+            Assert.AreEqual(0, repo.Llamadas);
+        }
+
+        [TestMethod]
+        public void InscribirEstudiante_ComoAdministrador_Funciona()
+        {
+            var s = new InscripcionService(new RepoInscripcionFalso());
+            Assert.IsTrue(s.InscribirEstudiante(1, 10, "Administrador").Exito);
         }
 
         [TestMethod]

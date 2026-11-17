@@ -1,10 +1,12 @@
-﻿namespace UniCampus.Entities
+namespace UniCampus.Entities
 {
     public enum ResultadoInscripcionDatos
     {
         Exito,
         SinCupo,
         Duplicada,
-        ActividadNoExiste
+        ActividadNoExiste,
+        ActividadNoDisponible,   // Finalizada, Inactiva o con fecha ya vencida
+        UsuarioNoValido          // No existe o no está activo
     }
 }

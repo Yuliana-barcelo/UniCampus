@@ -1,7 +1,7 @@
-<Solution>
+﻿<Solution>
+  <Project Path="Presentacion/UniCampus.Web/UniCampus.Web.csproj" Id="7a5ce1a9-b78f-482b-819f-b1ca98dbf407" />
   <Project Path="Business/uniCampus.BLL/UniCampus.BLL.csproj" Id="e058835d-dfa7-4ba7-837d-f769515fd9ad" />
   <Project Path="Data/UniCampus.DAL/UniCampus.DAL.csproj" Id="25a5b51f-01f5-4ab0-a8a6-cb0b03aef16e" />
-  <Project Path="Presentacion/UniCampus.Web/UniCampus.Web.csproj" Id="7a5ce1a9-b78f-482b-819f-b1ca98dbf407" />
   <Project Path="Tests/UniCampus.Test/UniCampus.Test.csproj" Id="8562fe5a-e1a3-41d0-8541-117a7349fb56" />
   <Project Path="Entities/UniCampus.Entities/UniCampus.Entities.csproj" Id="a3c725ed-95a2-4711-ad47-c0dab9e1fc22" />
 </Solution>
